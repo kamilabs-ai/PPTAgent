@@ -1,0 +1,30 @@
+version: '3.8'
+
+services:
+  pptagent:
+    build:
+      context: .
+      dockerfile: docker/Dockerfile
+    container_name: pptagent
+    ports:
+      - "8088:8088"  # Frontend Vue app (vue.config.js sets port to 8088)
+      - "9297:9297"  # Backend FastAPI (proxy target in vue.config.js)
+    volumes:
+      - ./:/PPTAgent
+      - pptagent_data:/PPTAgent/runs
+    environment:
+      - OPENAI_API_KEY=${OPENAI_API_KEY}
+      - PULL=False  # Set to True if you want to pull latest changes on startup
+    restart: unless-stopped
+    # Uncomment the following lines if using NVIDIA GPU
+    # deploy:
+    #   resources:
+    #     reservations:
+    #       devices:
+    #         - driver: nvidia
+    #           count: 1
+    #           capabilities: [gpu]
+
+volumes:
+  pptagent_data:
+    name: pptagent_data 
